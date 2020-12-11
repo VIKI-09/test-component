@@ -1,3 +1,4 @@
+@import '~antd/dist/antd.css';
 .App {
   text-align: center;
 }
@@ -26,6 +27,12 @@
 
 .App-link {
   color: #61dafb;
+}
+
+.editable-row .ant-form-item-explain {
+  position: absolute;
+  top: 100%;
+  font-size: 12px;
 }
 
 @keyframes App-logo-spin {
