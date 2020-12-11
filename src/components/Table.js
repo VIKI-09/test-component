@@ -79,14 +79,12 @@ const DataTable = () => {
   const add = () => {
     const newId = `f${(~~(Math.random() * 1e8)).toString(16)}`;
     const newKey = `k${(~~(Math.random() * 1e8)).toString(16)}`;
-    // form.setFieldsValue({
-    //   email: "",
-    //   first_name: "",
-    //   last_name: "",
-    //   age: "",
-    //   id: newId,
-    //   key: newKey,
-    // });
+    form.setFieldsValue({
+      email: "",
+      first_name: "",
+      last_name: "",
+      age: "",
+    });
     const newUser = {
       email: "",
       first_name: "",
