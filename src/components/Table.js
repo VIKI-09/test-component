@@ -1,8 +1,14 @@
-import React, { useState } from "react";
-import { Table, Form, Input, InputNumber, Popconfirm, Button } from "antd";
+import React, { useState, useEffect } from "react";
+import { Table, Form, Input, InputNumber, Button } from "antd";
 import { testTableData } from "./testTableData";
 import { UserAddOutlined } from "@ant-design/icons";
-const originData = [];
+import { connect, useDispatch, useSelector } from "react-redux";
+import {
+  addNewRecord,
+  editUser,
+  getTableData,
+  setEditingId,
+} from "../store/Table/actions";
 
 const Cell = ({
   editing,
@@ -16,7 +22,7 @@ const Cell = ({
 }) => {
   const inputNode =
     inputType === "number" ? (
-      <InputNumber />
+      <InputNumber min={0} />
     ) : (
       <Input autoFocus={title === "First Name"} placeholder={title} />
     );
@@ -44,14 +50,22 @@ const Cell = ({
   );
 };
 
-export const DataTable = () => {
+const DataTable = () => {
+  const usersList = useSelector((state) => state.tableData.users);
+  const isFetching = useSelector((state) => state.tableData.isFetching);
+  const editingId = useSelector((state) => state.tableData.editingId);
   const [form] = Form.useForm();
-  const [data, setData] = useState(testTableData);
-  const [editingId, setEditingId] = useState("");
-
+  const [data, setData] = useState();
+  // const [editingId, setEditingId] = useState("");
+  const dispatch = useDispatch();
   const isEditing = (record) => record.id === editingId;
 
+  useEffect(() => {
+    dispatch(getTableData());
+  }, []);
+
   const edit = (record) => {
+    console.log(record);
     form.setFieldsValue({
       email: "",
       first_name: "",
@@ -60,32 +74,28 @@ export const DataTable = () => {
       ...record,
     });
 
-    setEditingId(record.id);
+    dispatch(setEditingId(record.id));
   };
   const add = () => {
     const newId = `f${(~~(Math.random() * 1e8)).toString(16)}`;
-    form.setFieldsValue({
+    const newKey = `k${(~~(Math.random() * 1e8)).toString(16)}`;
+    // form.setFieldsValue({
+    //   email: "",
+    //   first_name: "",
+    //   last_name: "",
+    //   age: "",
+    //   id: newId,
+    //   key: newKey,
+    // });
+    const newUser = {
       email: "",
       first_name: "",
       last_name: "",
       age: "",
-      id: newId,
-      key: newId,
-    });
-
-    setData((prevState) => {
-      const newData = [...prevState];
-      newData.push({
-        email: "",
-        first_name: "",
-        last_name: "",
-        age: "",
-        id: newId,
-        key: `f${(~~(Math.random() * 1e8)).toString(16)}`,
-      });
-      return newData;
-    });
-    setEditingId(newId);
+      key: newKey,
+    };
+    dispatch(addNewRecord(newUser));
+    // setEditingId(newId);
   };
   const cancel = () => {
     setEditingId("");
@@ -94,21 +104,17 @@ export const DataTable = () => {
   const save = async (id) => {
     try {
       const row = await form.validateFields();
-      const newData = [...data];
+      const newData = [...usersList];
       const index = newData.findIndex((item) => id === item.id);
 
       if (index > -1) {
         const item = newData[index];
         newData.splice(index, 1, { ...item, ...row });
-        setData(newData);
-        setEditingId("");
-      } else {
-        newData.push(row);
-        setData(newData);
-        setEditingId("");
+        dispatch(editUser(newData, newData[index]));
+        dispatch(setEditingId(""));
       }
-    } catch (errInfo) {
-      console.log("Validate Failed:", errInfo);
+    } catch (e) {
+      console.log("Validate Failed:", e);
     }
   };
 
@@ -150,6 +156,9 @@ export const DataTable = () => {
           <Button type="default" onClick={() => edit(record)}>
             Edit
           </Button>
+          // <Button type="primary" danger onClick={() => deleteRow(record.id)}>
+          //   Delete
+          // </Button>
         );
       },
     },
@@ -178,14 +187,17 @@ export const DataTable = () => {
             cell: Cell,
           },
         }}
+        style={{ marginTop: "5%" }}
+        loading={isFetching}
         bordered
-        dataSource={data}
+        dataSource={usersList}
         columns={mergedColumns}
         rowClassName="editable-row"
         footer={() => (
           <Button
             type="primary"
             icon={<UserAddOutlined />}
+            style={{ width: "15%" }}
             onClick={() => add()}
           >
             Add
@@ -195,3 +207,5 @@ export const DataTable = () => {
     </Form>
   );
 };
+
+export default connect()(DataTable);

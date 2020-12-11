@@ -1,11 +1,16 @@
 import React from "react";
 import "./App.css";
-import { DataTable } from "./components/Table";
+import DataTable from "./components/Table";
+import { Row, Col } from "antd";
 
 function App() {
   return (
     <div className="App">
-      <DataTable />
+      <Row align="middle">
+        <Col span={20} offset={2}>
+          <DataTable />
+        </Col>
+      </Row>
     </div>
   );
 }
