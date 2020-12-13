@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Table, Form, Input, InputNumber, Button } from "antd";
-import { testTableData } from "./testTableData";
+import React, { useEffect } from "react";
+import { Table, Form,Button } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
 import { connect, useDispatch, useSelector } from "react-redux";
+import { Cell } from './Cell'
 import {
   addNewRecord,
   editUser,
@@ -10,53 +10,11 @@ import {
   setEditingId,
 } from "../store/Table/actions";
 
-const Cell = ({
-  editing,
-  dataIndex,
-  title,
-  inputType,
-  record,
-  index,
-  children,
-  ...restProps
-}) => {
-  const inputNode =
-    inputType === "number" ? (
-      <InputNumber min={0} />
-    ) : (
-      <Input autoFocus={title === "First Name"} placeholder={title} />
-    );
-  return (
-    <td {...restProps}>
-      {editing ? (
-        <Form.Item
-          name={dataIndex}
-          style={{
-            margin: 0,
-          }}
-          rules={[
-            {
-              required: true,
-              message: `Please Input ${title}!`,
-            },
-          ]}
-        >
-          {inputNode}
-        </Form.Item>
-      ) : (
-        children
-      )}
-    </td>
-  );
-};
-
 const DataTable = () => {
   const usersList = useSelector((state) => state.tableData.users);
   const isFetching = useSelector((state) => state.tableData.isFetching);
   const editingId = useSelector((state) => state.tableData.editingId);
   const [form] = Form.useForm();
-  const [data, setData] = useState();
-  // const [editingId, setEditingId] = useState("");
   const dispatch = useDispatch();
   const isEditing = (record) => record.id === editingId;
 
